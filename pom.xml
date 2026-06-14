@@ -29,7 +29,16 @@
 	<properties>
 		<java.version>17</java.version>
 	</properties>
-
+	<dependencyManagement>
+		<dependencies>
+			<!-- Correction vulnérabilité Commons Lang -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.18.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
