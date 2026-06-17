@@ -8,9 +8,7 @@ public class ProduitRequestDTO {
 
     // 🔐 Validation Input : empêche les données invalides de traverser
 
-    @NotBlank(message = "Le nom du produit est obligatoire")
-    @Size(min = 2, max = 100,
-            message = "Le nom doit contenir entre 2 et 100 caractères")
+
     private String nom;
 
     @Size(max = 500,
