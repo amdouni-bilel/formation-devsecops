@@ -68,12 +68,26 @@ public class ProduitServiceImpl implements ProduitService {
                 .orElseThrow(() ->
                         new ProduitNotFoundException(
                                 "Produit non trouvé avec l'ID : " + id));
+        // Calculer le stock final attendu sans modifier l'entité tout de suite
+        Integer stockAvant = produit.getStock();
+        Integer stockDto = dto.getStock();
+        Integer stockFinal = (stockDto != null) ? stockDto : stockAvant;
+
+        // Règle métier : n'autorise pas d'activer un produit si la requête demande l'activation
+        // et que le stock final est null ou égal à 0
+        boolean demandeActivation = Boolean.TRUE.equals(dto.getActif());
+        if (demandeActivation && (stockFinal == null || stockFinal.intValue() == 0)) {
+            throw new IllegalStateException("Impossible d'activer le produit : stock insuffisant");
+        }
+
+        // Appliquer ensuite les modifications
         produit.setNom(dto.getNom());
         produit.setDescription(dto.getDescription());
         produit.setPrix(dto.getPrix());
-        produit.setStock(dto.getStock());
+        produit.setStock(stockFinal);
         produit.setCategorie(dto.getCategorie());
         if (dto.getActif() != null) produit.setActif(dto.getActif());
+
         return mapToResponseDTO(produitRepository.save(produit));
     }
 

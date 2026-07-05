@@ -24,18 +24,21 @@ public class GlobalExceptionHandler {
 
     // Gestion des erreurs de validation (@Valid)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(
+    public ResponseEntity<Map<String, Object>> handleValidation(
             MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String field = ((FieldError) error).getField();
-            errors.put(field, error.getDefaultMessage());
-        });
-        // 🔐 On ne logue pas les valeurs saisies par l'utilisateur
-        log.warn("[VALIDATION] {} erreur(s) de validation", errors.size());
-        return ResponseEntity.badRequest().body(
-                new ErrorResponse(400, "Données invalides",
-                        LocalDateTime.now(), errors));
+
+        Map<String, String> details = new HashMap<>();
+
+        ex.getBindingResult().getFieldErrors()
+                .forEach(error ->
+                        details.put(error.getField(),
+                                error.getDefaultMessage()));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", 400);
+        response.put("details", details);
+
+        return ResponseEntity.badRequest().body(response);
     }
 
     // Gestion : produit non trouvé → 404
