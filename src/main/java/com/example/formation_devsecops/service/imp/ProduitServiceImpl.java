@@ -9,6 +9,7 @@ import com.example.formation_devsecops.repository.ProduitRepository;
 import com.example.formation_devsecops.service.ProduitService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.example.formation_devsecops.util.LogSanitizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +29,10 @@ public class ProduitServiceImpl implements ProduitService {
     @Override
     @Transactional
     public ProduitResponseDTO creerProduit(ProduitRequestDTO requestDTO) {
-        log.info("[SERVICE] Création produit : {}", requestDTO.getNom());
+        log.info("[SERVICE] Création produit : {}", LogSanitizer.sanitize(requestDTO.getNom()));
         Produit produit = mapToEntity(requestDTO);
         Produit saved = produitRepository.save(produit);
-        log.info("[SERVICE] Produit créé avec ID : {}", saved.getId());
+        log.info("[SERVICE] Produit créé avec ID : {}", LogSanitizer.sanitize(saved.getId()));
         return mapToResponseDTO(saved);
     }
 
@@ -63,7 +64,7 @@ public class ProduitServiceImpl implements ProduitService {
     @Override
     @Transactional
     public ProduitResponseDTO modifierProduit(Long id, ProduitRequestDTO dto) {
-        log.info("[SERVICE] Modification produit ID : {}", id);
+        log.info("[SERVICE] Modification produit ID : {}", LogSanitizer.sanitize(id));
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() ->
                         new ProduitNotFoundException(
@@ -97,7 +98,7 @@ public class ProduitServiceImpl implements ProduitService {
     @Override
     @Transactional
     public void supprimerProduit(Long id) {
-        log.info("[SERVICE] Suppression produit ID : {}", id);
+        log.info("[SERVICE] Suppression produit ID : {}", LogSanitizer.sanitize(id));
         if (!produitRepository.existsById(id)) {
             throw new ProduitNotFoundException(
                     "Produit non trouvé avec l'ID : " + id);
